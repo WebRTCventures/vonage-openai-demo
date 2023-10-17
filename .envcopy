@@ -1,0 +1,8 @@
+# enter your TokBox api key after the '=' sign below
+TOKBOX_API_KEY=your_api_key
+
+# enter your TokBox api secret after the '=' sign below
+TOKBOX_SECRET=your_project_secret
+
+# enter your openai secret after the '=' sign below
+OPENAI_SECRET=your_openai_secret
