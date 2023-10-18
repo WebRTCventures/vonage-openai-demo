@@ -65,23 +65,7 @@ async function initializeSession() {
       }
       const captionText = event.caption;
       const subscriberContainer = OT.subscribers.find().element;
-      const [subscriberWidget] = subscriberContainer.getElementsByClassName('OT_widget-container');
-
-      const oldCaptionBox = subscriberWidget.querySelector('.caption-box');
-      if (oldCaptionBox) oldCaptionBox.remove();
-
-      const captionBox = document.createElement('div');
-      captionBox.classList.add('caption-box');
-      captionBox.textContent = captionText;
-
-      // remove the captions after 5 seconds
-      const removalTimerDuration = 5 * 1000;
-      clearTimeout(captionsRemovalTimer);
-      captionsRemovalTimer = setTimeout(() => {
-        captionBox.textContent = '';
-      }, removalTimerDuration);
-
-      subscriberWidget.appendChild(captionBox);
+      displayCaptions(captionText, 'OT_widget-container', subscriberContainer);
     });
   });
 
@@ -180,9 +164,35 @@ function stopAnimateVoiceSynthesis() {
   }
 }
 
+function displayCaptions(captionText, className, container = document) {
+  const [subscriberWidget] = container.getElementsByClassName(className);
+  const oldCaptionBox = subscriberWidget.querySelector('.caption-box');
+  if (oldCaptionBox) oldCaptionBox.remove();
+
+  const captionBox = document.createElement('div');
+  captionBox.classList.add('caption-box');
+  captionBox.textContent = captionText;
+
+  // remove the captions after 5 seconds
+  const removalTimerDuration = 5 * 1000;
+  clearTimeout(captionsRemovalTimer);
+  captionsRemovalTimer = setTimeout(() => {
+    captionBox.textContent = '';
+  }, removalTimerDuration);
+
+  subscriberWidget.appendChild(captionBox);
+}
+
 function speakText(text) {
+  let captions = '';
   const utterThis = new SpeechSynthesisUtterance(text);
-  utterThis.voice = voices[49];
+
+  utterThis.voice = voices[33];
+
+  utterThis.onboundary = (event) => {
+    captions += `${event.utterance.text.substring(event.charIndex, event.charIndex + event.charLength)} `;
+    displayCaptions(captions, 'ai-assistant');
+  };
 
   utterThis.onstart = () => {
     animateVoiceSynthesis();
@@ -198,7 +208,7 @@ function speakText(text) {
 async function startAiGenerator(message) {
   let aiText = '';
   let utterableText = ''
-  console.log('STARTING AI GENERATOR');
+
   abortController = new AbortController();
   const userMessage = {
     'role': 'user',
