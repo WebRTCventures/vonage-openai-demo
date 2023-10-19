@@ -102,6 +102,7 @@ async function initializeSession() {
               );
               speakText(greetingMessage);
               captionOnlySub.on('captionReceived', async (event) => {
+                console.log('Event.captions', event.caption)
                 if (event.isFinal) {
                   stopAiGenerator();
                   startAiGenerator(event.caption)
@@ -187,7 +188,7 @@ function speakText(text) {
   let captions = '';
   const utterThis = new SpeechSynthesisUtterance(text);
 
-  utterThis.voice = voices[33];
+  utterThis.voice = voices.find((v) => v.name.includes('Samantha'));
 
   utterThis.onboundary = (event) => {
     captions += `${event.utterance.text.substring(event.charIndex, event.charIndex + event.charLength)} `;
